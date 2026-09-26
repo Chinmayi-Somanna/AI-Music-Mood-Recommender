@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AI Music Mood Recommender</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #312e81 0%,
+                    #0f172a 45%,
+                    #020617 100%
+                );
+
+            color: white;
+
+            min-height: 100vh;
+
+        }
+
+
+        /* ================= NAVBAR ================= */
+
+        nav {
+
+            height: 70px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 8%;
+
+            background: rgba(15, 23, 42, 0.9);
+
+            border-bottom:
+                1px solid rgba(255,255,255,0.08);
+
+        }
+
+
+        .logo {
+
+            font-size: 24px;
+
+            font-weight: bold;
+
+        }
+
+
+        .login-btn {
+
+            padding: 10px 22px;
+
+            border: none;
+
+            border-radius: 25px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+            background: white;
+
+            color: #111827;
+
+        }
+
+
+        /* ================= HERO ================= */
+
+        .hero {
+
+            text-align: center;
+
+            padding: 70px 20px 40px;
+
+        }
+
+
+        .hero h1 {
+
+            font-size: 52px;
+
+            line-height: 1.1;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .hero h1 span {
+
+            color: #a78bfa;
+
+        }
+
+
+        .hero p {
+
+            color: #cbd5e1;
+
+            font-size: 18px;
+
+            margin-bottom: 35px;
+
+        }
+
+
+        /* ================= BUTTONS ================= */
+
+        .buttons {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 20px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+        .main-btn {
+
+            padding: 16px 30px;
+
+            border: none;
+
+            border-radius: 30px;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+            transition: 0.3s;
+
+        }
+
+
+        .main-btn:hover {
+
+            transform: translateY(-2px);
+
+            opacity: 0.9;
+
+        }
+
+
+        .camera-btn {
+
+            background: #8b5cf6;
+
+            color: white;
+
+        }
+
+
+        .voice-btn {
+
+            background: #334155;
+
+            color: white;
+
+        }
+
+
+        /* ================= CAMERA AREA ================= */
+
+        #cameraSection {
+
+            display: none;
+
+            width: 90%;
+
+            max-width: 700px;
+
+            margin: 30px auto;
+
+            text-align: center;
+
+        }
+
+
+        .camera-box {
+
+            background: #111827;
+
+            padding: 20px;
+
+            border-radius: 25px;
+
+            border:
+                1px solid rgba(255,255,255,0.08);
+
+            box-shadow:
+                0 20px 50px rgba(0,0,0,0.35);
+
+        }
+
+
+        #video {
+
+            width: 100%;
+
+            max-width: 600px;
+
+            border-radius: 20px;
+
+            background: black;
+
+            display: block;
+
+            margin: auto;
+
+        }
+
+
+        #canvas {
+
+            display: none;
+
+        }
+
+
+        #cameraStatus {
+
+            margin-top: 15px;
+
+            font-size: 18px;
+
+            color: #cbd5e1;
+
+        }
+
+
+        /* ================= MOOD RESULT ================= */
+
+        #moodResult {
+
+            display: none;
+
+            width: 90%;
+
+            max-width: 700px;
+
+            margin: 25px auto;
+
+            padding: 25px;
+
+            text-align: center;
+
+            background: #1e293b;
+
+            border-radius: 20px;
+
+            border:
+                1px solid rgba(167,139,250,0.3);
+
+        }
+
+
+        #moodResult h2 {
+
+            color: #a78bfa;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        #detectedMood {
+
+            font-size: 30px;
+
+            font-weight: bold;
+
+            margin-top: 10px;
+
+        }
+
+
+        #confidence {
+
+            color: #94a3b8;
+
+            margin-top: 8px;
+
+        }
+
+
+        /* ================= LANGUAGE ================= */
+
+        #languageSection {
+
+            display: none;
+
+            width: 90%;
+
+            max-width: 700px;
+
+            margin: 25px auto;
+
+            padding: 30px;
+
+            text-align: center;
+
+            background: #1e293b;
+
+            border-radius: 20px;
+
+            border:
+                1px solid rgba(255,255,255,0.08);
+
+        }
+
+
+        #languageSection h2 {
+
+            margin-bottom: 10px;
+
+        }
+
+
+        #languageSection p {
+
+            color: #94a3b8;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        #language {
+
+            width: 80%;
+
+            max-width: 400px;
+
+            padding: 14px 18px;
+
+            border-radius: 12px;
+
+            border: 1px solid #475569;
+
+            background: #0f172a;
+
+            color: white;
+
+            font-size: 16px;
+
+            outline: none;
+
+            cursor: pointer;
+
+        }
+
+
+        #language:focus {
+
+            border-color: #8b5cf6;
+
+        }
+
+
+        .recommend-btn {
+
+            margin-top: 20px;
+
+            padding: 14px 28px;
+
+            border: none;
+
+            border-radius: 25px;
+
+            background: #8b5cf6;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+        }
+
+
+        /* ================= SONG AREA ================= */
+
+        #songsContainer {
+
+            width: 90%;
+
+            max-width: 850px;
+
+            margin: 30px auto 60px;
+
+        }
+
+
+        .music-player {
+
+            background: #1e293b;
+
+            padding: 25px;
+
+            border-radius: 25px;
+
+            text-align: center;
+
+            margin-bottom: 30px;
+
+            border:
+                1px solid rgba(167,139,250,0.3);
+
+            box-shadow:
+                0 15px 40px rgba(0,0,0,0.3);
+
+        }
+
+
+        .music-player h2 {
+
+            color: #a78bfa;
+
+            margin-bottom: 15px;
+
+        }
+
+
+        .music-player h3 {
+
+            font-size: 24px;
+
+            margin-bottom: 5px;
+
+        }
+
+
+        .music-player p {
+
+            color: #94a3b8;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .music-player iframe {
+
+            width: 100%;
+
+            max-width: 700px;
+
+            height: 390px;
+
+            border: none;
+
+            border-radius: 18px;
+
+        }
+
+
+        .recommendation-title {
+
+            text-align: center;
+
+            margin: 30px 0 20px;
+
+            font-size: 25px;
+
+        }
+
+
+        .song-list {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 15px;
+
+        }
+
+
+        .song-card {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            padding: 20px;
+
+            background: #1e293b;
+
+            border-radius: 18px;
+
+            border:
+                1px solid rgba(255,255,255,0.07);
+
+        }
+
+
+        .song-info strong {
+
+            font-size: 18px;
+
+        }
+
+
+        .song-info p {
+
+            color: #94a3b8;
+
+            margin-top: 5px;
+
+        }
+
+
+        .play-btn {
+
+            padding: 10px 20px;
+
+            border: none;
+
+            border-radius: 20px;
+
+            background: #8b5cf6;
+
+            color: white;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+
+        }
+
+
+        /* ================= FEATURES ================= */
+
+        .features {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 25px;
+
+            padding: 40px 30px 70px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+        .card {
+
+            width: 250px;
+
+            padding: 25px;
+
+            background: #1e293b;
+
+            border-radius: 18px;
+
+            text-align: center;
+
+            border:
+                1px solid rgba(255,255,255,0.06);
+
+        }
+
+
+        .card h3 {
+
+            margin: 15px 0 10px;
+
+        }
+
+
+        .card p {
+
+            color: #94a3b8;
+
+            line-height: 1.5;
+
+        }
+
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 600px) {
+
+            .hero h1 {
+
+                font-size: 38px;
+
+            }
+
+
+            .hero {
+
+                padding-top: 50px;
+
+            }
+
+
+            #language {
+
+                width: 100%;
+
+            }
+
+
+            .song-card {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+            }
+
+
+            .play-btn {
+
+                width: 100%;
+
+            }
+
+
+            .music-player iframe {
+
+                height: 250px;
+
+            }
+
+        }
+
+
+        /* ================= LOGIN SCREEN ================= */
+
+        #loginScreen {
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 9999;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #312e81 0%,
+                    #0f172a 50%,
+                    #020617 100%
+                );
+
+        }
+
+
+        .login-box {
+
+            width: 90%;
+
+            max-width: 420px;
+
+            padding: 40px 30px;
+
+            background: rgba(30, 41, 59, 0.95);
+
+            border-radius: 25px;
+
+            text-align: center;
+
+            box-shadow:
+                0 20px 60px rgba(0,0,0,0.5);
+
+            border:
+                1px solid rgba(167,139,250,0.3);
+
+        }
+
+
+        .login-logo {
+
+            font-size: 48px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .login-box h1 {
+
+            color: #a78bfa;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .login-box p {
+
+            color: #cbd5e1;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        #emailInput {
+
+            width: 100%;
+
+            padding: 15px 18px;
+
+            border-radius: 12px;
+
+            border:
+                1px solid #475569;
+
+            background: #0f172a;
+
+            color: white;
+
+            font-size: 16px;
+
+            outline: none;
+
+            margin-bottom: 15px;
+
+        }
+
+
+        #emailInput:focus {
+
+            border-color: #8b5cf6;
+
+        }
+
+
+        #loginContinue {
+
+            width: 100%;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 25px;
+
+            background: #8b5cf6;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+
+        }
+
+
+        #loginContinue:hover {
+
+            opacity: 0.9;
+
+            transform: translateY(-2px);
+
+        }
+
+
+        #loginError {
+
+            color: #f87171;
+
+            margin-top: 12px;
+
+            display: none;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ================= LOGIN SCREEN ================= -->
+
+    <div id="loginScreen">
+
+        <div class="login-box">
+
+            <div class="login-logo">
+                🎵
+            </div>
+
+            <h1>Welcome to MoodTune</h1>
+
+            <p>
+                Enter your email to discover music
+                that matches your mood.
+            </p>
+
+            <input
+                type="email"
+                id="emailInput"
+                placeholder="Enter your email"
+                autocomplete="email"
+            >
+
+            <button id="loginContinue">
+                Continue →
+            </button>
+
+            <div id="loginError">
+                Please enter a valid email address.
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav>
+
+    <div class="logo">
+        🎵 MoodTune
+    </div>
+
+    </nav>
+
+
+
+    <!-- ================= HERO ================= -->
+
+    <section class="hero">
+
+        <h1>
+
+            Music that matches<br>
+
+            <span>your mood.</span>
+
+        </h1>
+
+
+        <p>
+
+            Let AI understand how you feel and discover music
+            made for your mood.
+
+        </p>
+
+
+        <div class="buttons">
+
+            <button
+                id="cameraButton"
+                class="main-btn camera-btn">
+
+                📷 Detect My Mood
+
+            </button>
+
+
+          <button
+    id="voiceButton"
+    class="main-btn voice-btn">
+
+    🎤 Use My Voice
+
+</button>
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= CAMERA ================= -->
+
+    <section id="cameraSection">
+
+        <div class="camera-box">
+
+            <video
+                id="video"
+                autoplay
+                playsinline>
+            </video>
+
+            <canvas id="canvas"></canvas>
+
+            <p id="cameraStatus">
+                📷 Camera ready
+            </p>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= MOOD RESULT ================= -->
+
+    <section id="moodResult">
+
+        <h2>
+            🤖 AI Mood Analysis
+        </h2>
+
+        <div id="detectedMood">
+            —
+        </div>
+
+        <div id="confidence">
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= LANGUAGE ================= -->
+
+    <section id="languageSection">
+
+        <h2>
+            🌐 Choose Your Language
+        </h2>
+
+        <p>
+            Your mood has been detected.
+            Now choose the language you want for your music.
+        </p>
+
+
+        <select id="language">
+
+            <option value="">
+                -- Select Language --
+            </option>
+
+            <option value="english">
+                🇬🇧 English
+            </option>
+
+            <option value="kannada">
+                🇮🇳 Kannada
+            </option>
+
+            <option value="hindi">
+                🇮🇳 Hindi
+            </option>
+
+            <option value="tamil">
+                🇮🇳 Tamil
+            </option>
+
+            <option value="telugu">
+                🇮🇳 Telugu
+            </option>
+
+            <option value="malayalam">
+                🇮🇳 Malayalam
+            </option>
+
+        </select>
+
+
+        <br>
+<button
+    type="button"
+    class="recommend-btn"
+    id="recommendButton">
+
+    🎵 Get My Songs
+
+</button>
+    </section>
+
+
+
+    <!-- ================= SONG RECOMMENDATIONS ================= -->
+
+    <section id="songsContainer">
+    </section>
+
+
+
+    <!-- ================= FEATURES ================= -->
+
+    <section class="features">
+
+
+        <div class="card">
+
+            <div style="font-size:40px;">
+                📷
+            </div>
+
+            <h3>
+                Facial Emotion
+            </h3>
+
+            <p>
+                AI analyzes your facial expression
+                to understand your current mood.
+            </p>
+
+        </div>
+
+
+
+        <div class="card">
+
+            <div style="font-size:40px;">
+                🎤
+            </div>
+
+            <h3>
+                Voice Emotion
+            </h3>
+
+            <p>
+                Voice-based emotion detection
+                will be available soon.
+            </p>
+
+        </div>
+
+
+
+        <div class="card">
+
+            <div style="font-size:40px;">
+                🎵
+            </div>
+
+            <h3>
+                Smart Playlist
+            </h3>
+
+            <p>
+                Get music recommendations based
+                on your mood and language.
+            </p>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <!-- ================= LOGIN SCRIPT ================= -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const loginScreen =
+                    document.getElementById("loginScreen");
+
+                const emailInput =
+                    document.getElementById("emailInput");
+
+                const loginContinue =
+                    document.getElementById("loginContinue");
+
+                const loginError =
+                    document.getElementById("loginError");
+
+                
+
+                function showLogin() {
+
+                    loginScreen.style.display = "flex";
+
+                    emailInput.focus();
+
+                }
+
+
+                function hideLogin() {
+
+                    loginScreen.style.display = "none";
+
+                }
+
+
+                function login() {
+
+                    const email =
+                        emailInput.value.trim();
+
+
+                    const emailPattern =
+                        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+                    if (!emailPattern.test(email)) {
+
+                        loginError.style.display = "block";
+
+                        emailInput.focus();
+
+                        return;
+
+                    }
+
+
+                    loginError.style.display = "none";
+
+
+                    localStorage.setItem(
+                        "moodtune_email",
+                        email
+                    );
+
+
+                    hideLogin();
+
+                }
+
+
+                loginContinue.addEventListener(
+                    "click",
+                    login
+                );
+
+
+                emailInput.addEventListener(
+                    "keydown",
+                    function (event) {
+
+                        if (event.key === "Enter") {
+
+                            login();
+
+                        }
+
+                    }
+                );
+
+
+               
+
+
+                const savedEmail =
+                    localStorage.getItem(
+                        "moodtune_email"
+                    );
+
+
+                if (savedEmail) {
+
+                    hideLogin();
+
+                } else {
+
+                    showLogin();
+
+                }
+
+            }
+
+        );
+
+    </script>
+
+
+    <script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+
+
+</body>
+
+</html>
